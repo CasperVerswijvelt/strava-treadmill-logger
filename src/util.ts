@@ -1,3 +1,5 @@
+import { Buffer } from "buffer";
+
 export const calculateAltitudeGain = (inclinePercentage:number, distanceKm:number) => {
     // Convert distance from kilometers to meters
     const distanceMeters = distanceKm * 1000;

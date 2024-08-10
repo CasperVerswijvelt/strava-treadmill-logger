@@ -2,17 +2,13 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useSessionStorage } from "usehooks-ts";
 
 type StravaAuthType = {
-  accesToken: string;
-  refreshToken: string;
-  expiresAt: number;
   loggedInName: string;
+  uploadActivity: (name: string, activityFile: Blob) => Promise<Response>;
 };
 
 export const StravaAuthContext = createContext<StravaAuthType>({
-  accesToken: "",
-  refreshToken: "",
-  expiresAt: 0,
   loggedInName: "",
+  uploadActivity: () => Promise.reject("No context"),
 });
 
 const params = new URLSearchParams(window.location.search);
@@ -79,6 +75,20 @@ export const StravaAuthProvider: React.FC<React.PropsWithChildren<unknown>> = ({
     await syncLoggedInName();
   };
 
+  const uploadActivity = async (name: string, activityFile: Blob) => {
+    const formData = new FormData();
+    formData.append("file", activityFile);
+    formData.append("name", name);
+    formData.append("data_type", "fit");
+    return await fetch("https://www.strava.com/api/v3/uploads", {
+      method: "POST",
+      body: formData,
+      headers: {
+        Authorization: `Bearer ${accesToken}`,
+      },
+    });
+  };
+
   useEffect(() => {
     if (code) {
       let formData = new FormData();
@@ -99,10 +109,8 @@ export const StravaAuthProvider: React.FC<React.PropsWithChildren<unknown>> = ({
   return (
     <StravaAuthContext.Provider
       value={{
-        accesToken,
-        refreshToken,
-        expiresAt,
         loggedInName,
+        uploadActivity,
       }}
     >
       {children}
