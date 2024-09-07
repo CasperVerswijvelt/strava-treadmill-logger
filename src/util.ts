@@ -1,5 +1,3 @@
-import { Buffer } from "buffer";
-
 export const calculateAltitudeGain = (inclinePercentage:number, distanceKm:number) => {
     // Convert distance from kilometers to meters
     const distanceMeters = distanceKm * 1000;
@@ -20,15 +18,33 @@ export const calculateCaloriesBurned = (
     const durationHours = durationMinutes / 60;
 
     // Estimate MET value based on incline percentage and speed
-    // For simplicity, using an average MET value for walking/running on an incline
     const averageSpeedKmh = distanceKm / durationHours;
-    let MET: number;
 
-    if (inclinePercentage >= 10) {
-        MET = averageSpeedKmh > 8 ? 11.5 : 9.0; // Running vs brisk walking on a steep incline
-    } else {
-        MET = averageSpeedKmh > 8 ? 9.8 : 5.0; // Running vs brisk walking on a moderate incline
-    }
+    // Function to calculate MET dynamically based on speed and incline
+    const getMET = (speed: number, incline: number): number => {
+        let baseMET: number;
+
+        // Estimate base MET based on speed (values can be fine-tuned)
+        if (speed < 4) {
+            baseMET = 2.0; // Casual walking
+        } else if (speed < 6) {
+            baseMET = 3.8; // Brisk walking
+        } else if (speed < 8) {
+            baseMET = 7.0; // Light jogging
+        } else if (speed < 10) {
+            baseMET = 9.8; // Running
+        } else {
+            baseMET = 11.5; // Fast running
+        }
+
+        // Adjust MET based on incline percentage
+        const inclineFactor = 1 + incline / 10; // 10% incline increases MET by 10%
+
+        return baseMET * inclineFactor;
+    };
+
+    // Calculate MET based on speed and incline
+    const MET = getMET(averageSpeedKmh, inclinePercentage);
 
     // Calculate calories burned
     const caloriesBurned = durationHours * MET * weightKg;
