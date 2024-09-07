@@ -17,6 +17,10 @@ function App() {
     13.37
   );
   const [weight, setWeight] = useSessionStorage("last_weight", 72);
+  const [activityName, setActivityName] = useSessionStorage(
+    "activity_name",
+    "Loopband"
+  );
 
   const [uploading, setUploading] = useState(false);
 
@@ -68,9 +72,9 @@ function App() {
   return (
     <>
       {!loggedInName && (
-        <>
+        <div className="p-4">
           <a
-            className="inline-block w-auto bg-orange-600 hover:bg-orange-700 text-white hover:text-white font-bold p-2 mt-4 w-full rounded mb-2"
+            className="inline-block w-auto bg-orange-600 hover:bg-orange-700 text-white hover:text-white font-bold p-2 w-full rounded"
             href={`http://www.strava.com/oauth/authorize?client_id=${
               import.meta.env.VITE_CLIENT_ID
             }&response_type=code&redirect_uri=${
@@ -79,7 +83,7 @@ function App() {
           >
             Connect strava
           </a>
-        </>
+        </div>
       )}
       {loggedInName && <p>Logged in as {loggedInName}</p>}
       <form
@@ -98,16 +102,24 @@ function App() {
           );
           const blob = new Blob([fitData], { type: "application/fits" });
 
+          const promptActivityName = prompt(
+            "Enter activity name",
+            activityName
+          );
+          if (!promptActivityName) {
+            setUploading(false);
+            return;
+          }
+          setActivityName(promptActivityName);
+
           try {
-            const response = await uploadActivity("Testje, negeer pls", blob);
+            const response = await uploadActivity(promptActivityName, blob);
 
             console.log({ response });
             console.log({ json: await response.json() });
           } catch (error) {
             console.error(error);
           }
-
-          //saveAs(blob, "activity.fit");
 
           setUploading(false);
         }}
@@ -131,13 +143,13 @@ function App() {
         <div className="flex w-full">
           <button
             type="submit"
-            className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 mt-4 w-full rounded disabled:opacity-50 disabled:pointer-events-none"
-            disabled={uploading}
+            className="flex-1 bg-blue-500 hover:bg-blue-700 text-white font-bold p-2 w-full rounded disabled:opacity-50 disabled:pointer-events-none"
+            disabled={uploading || !loggedInName}
           >
             Upload activity
           </button>
           <button
-            className="bg-blue-500 hover:bg-blue-700 p-2 mt-4 rounded ml-2"
+            className="bg-blue-500 hover:bg-blue-700 p-2 rounded ml-2"
             onClick={async (e) => {
               e.preventDefault();
               saveAs(await getActivityBlob(), "activity.fit");
