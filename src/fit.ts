@@ -17,7 +17,7 @@ export const createFitFile = (
   const startLongitude = -40;
 
   // Calculate the number of data pointss
-  const numDataPoints = Math.max(Math.ceil(duration / 30), 100);
+  const numDataPoints = Math.max(Math.ceil(duration / 10), 100);
 
   const degreesToSemicircles = (degrees: number) =>
     fitWriter.latlng(degrees * (Math.PI / 180)); // Convert degrees to semi-circles
