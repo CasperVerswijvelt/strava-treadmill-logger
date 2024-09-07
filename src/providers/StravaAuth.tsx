@@ -18,18 +18,12 @@ window.history.replaceState({}, "", window.location.origin);
 export const StravaAuthProvider: React.FC<React.PropsWithChildren<unknown>> = ({
   children,
 }) => {
-  const [accesToken, setAccessToken, removeAccessToken] = useSessionStorage(
-    "access-token",
-    ""
-  );
-  const [refreshToken, setRefreshToken, removeRefreshToken] = useSessionStorage(
+  const [accesToken, setAccessToken] = useSessionStorage("access-token", "");
+  const [refreshToken, setRefreshToken] = useSessionStorage(
     "refresh-token",
     ""
   );
-  const [expiresAt, setExpiresAt, removeExpiresAt] = useSessionStorage(
-    "expires-at",
-    0
-  );
+  const [expiresAt, setExpiresAt] = useSessionStorage("expires-at", 0);
 
   const [loggedInName, setLoggedInName] = useState("");
 
