@@ -38,7 +38,8 @@ function App() {
       distance * 1000,
       altitudeGain,
       caloriesBurned,
-      duration * 60
+      duration * 60,
+      weight
     );
     return new Blob([fitData], { type: "application/fits" });
   };
@@ -99,7 +100,8 @@ function App() {
             distance * 1000,
             altitudeGain,
             caloriesBurned,
-            duration * 60
+            duration * 60,
+            weight
           );
           const blob = new Blob([fitData], { type: "application/fits" });
 
