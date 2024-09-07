@@ -87,7 +87,7 @@ function App() {
           </a>
         </div>
       )}
-      {loggedInName && <p>Logged in as {loggedInName}</p>}
+      {loggedInName && <p className="pb-5 pt-5">Logged in as {loggedInName}</p>}
       <form
         className="flex flex-col gap-4 p-4 items-start"
         onSubmit={async (e) => {
