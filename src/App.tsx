@@ -117,6 +117,8 @@ function App() {
             const response = await uploadActivity(promptActivityName, blob);
             const json = await response.json();
 
+            console.log("JSON response: ", json);
+
             if (json.error) {
               alert(`Error: ${json.error}`);
             } else {
