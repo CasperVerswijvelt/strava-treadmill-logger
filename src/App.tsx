@@ -6,6 +6,7 @@ import { calculateAltitudeGain, calculateCaloriesBurned } from "./util.ts";
 import { saveAs } from "file-saver";
 import { createFitFile } from "./fit.ts";
 import { useState } from "react";
+import { NumberInput } from "./components/NumberInput.tsx";
 
 function App() {
   const { loggedInName, uploadActivity } = useStravaAuth();
@@ -135,13 +136,13 @@ function App() {
               <p>{label}</p>
               <i className="text-gray-400">{unit}</i>
             </label>
-            <input
+            <NumberInput
               id={`${index}`}
-              type="number"
               value={value}
-              onChange={(e) => setValue(Number(e.target.value))}
-              className="border-2 border-black rounded-md p-2"
-            />
+              onChange={(newValue) => setValue(newValue)}
+              className="rounded-md p-2"
+              placeHolder={`${value}`}
+            ></NumberInput>
           </div>
         ))}
 
