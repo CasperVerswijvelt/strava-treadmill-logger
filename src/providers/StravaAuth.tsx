@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
-import { useSessionStorage } from "usehooks-ts";
+import { useLocalStorage } from "usehooks-ts";
 
 type StravaAuthType = {
   loggedInName: string;
@@ -18,20 +18,19 @@ window.history.replaceState({}, "", window.location.origin);
 export const StravaAuthProvider: React.FC<React.PropsWithChildren<unknown>> = ({
   children,
 }) => {
-  const [accesToken, setAccessToken] = useSessionStorage("access-token", "");
-  const [refreshToken, setRefreshToken] = useSessionStorage(
-    "refresh-token",
-    ""
-  );
-  const [expiresAt, setExpiresAt] = useSessionStorage("expires-at", 0);
+  const [accesToken, setAccessToken] = useLocalStorage("access-token", "");
+  const [refreshToken, setRefreshToken] = useLocalStorage("refresh-token", "");
+  const [expiresAt, setExpiresAt] = useLocalStorage("expires-at", 0);
 
   const [loggedInName, setLoggedInName] = useState("");
 
-  const syncLoggedInName = async () => {
-    if (accesToken) {
+  const syncLoggedInName = async (overrrideAccesToken?: string) => {
+    const accessTokenToUse = overrrideAccesToken || accesToken;
+    console.log("Syncing logged in name ", accessTokenToUse);
+    if (accessTokenToUse) {
       const json = await fetch("https://www.strava.com/api/v3/athlete", {
         headers: {
-          Authorization: `Bearer ${accesToken}`,
+          Authorization: `Bearer ${accessTokenToUse}`,
         },
       }).then((response) => response.json());
       setLoggedInName(json["firstname"]);
@@ -55,18 +54,22 @@ export const StravaAuthProvider: React.FC<React.PropsWithChildren<unknown>> = ({
   };
 
   const handleAuthResponse = async (response: Response) => {
+    let newAccessToken = "";
     if (response.status === 200) {
+      console.log("ok response");
       const json = await response.json();
-      setAccessToken(json["access_token"]);
+      newAccessToken = json["access_token"];
+      setAccessToken(newAccessToken);
       setRefreshToken(json["refresh_token"]);
       setExpiresAt(json["expires_at"]);
     } else {
+      console.log("bad response: ", response);
       setAccessToken("");
       setRefreshToken("");
       setExpiresAt(0);
     }
 
-    await syncLoggedInName();
+    await syncLoggedInName(newAccessToken);
   };
 
   const uploadActivity = async (name: string, activityFile: Blob) => {
@@ -94,6 +97,7 @@ export const StravaAuthProvider: React.FC<React.PropsWithChildren<unknown>> = ({
         body: formData,
       }).then(handleAuthResponse);
     } else if (expiresAt) {
+      console.log("Refreshing token");
       refreshAccessToken();
     } else if (accesToken) {
       syncLoggedInName();

@@ -1,7 +1,7 @@
 import { useStravaAuth } from "./providers/StravaAuth.tsx";
 
 import "./App.css";
-import { useSessionStorage } from "usehooks-ts";
+import { useLocalStorage } from "usehooks-ts";
 import { calculateAltitudeGain, calculateCaloriesBurned } from "./util.ts";
 import { saveAs } from "file-saver";
 import { createFitFile } from "./fit.ts";
@@ -11,14 +11,14 @@ import { NumberInput } from "./components/NumberInput.tsx";
 function App() {
   const { loggedInName, uploadActivity } = useStravaAuth();
 
-  const [distance, setDistance] = useSessionStorage("last_distance", 2.6);
-  const [duration, setDuration] = useSessionStorage("last_duration", 30);
-  const [inclinePercentage, setInclinePercentage] = useSessionStorage(
+  const [distance, setDistance] = useLocalStorage("last_distance", 2.6);
+  const [duration, setDuration] = useLocalStorage("last_duration", 30);
+  const [inclinePercentage, setInclinePercentage] = useLocalStorage(
     "last_incline",
     13.37
   );
-  const [weight, setWeight] = useSessionStorage("last_weight", 72);
-  const [activityName, setActivityName] = useSessionStorage(
+  const [weight, setWeight] = useLocalStorage("last_weight", 72);
+  const [activityName, setActivityName] = useLocalStorage(
     "activity_name",
     "Loopband"
   );
