@@ -10,7 +10,6 @@ export const createFitFile = (
   const endTime = new Date(); // Current time as the end time
   const startTime = new Date(endTime.getTime() - duration * 1000); // Start time is now minus the duration
   const fitWriter = new FitWriter();
-  const start = fitWriter.time(startTime);
 
   // Define the starting latitude and longitude
   const startLatitude = 10;
@@ -30,7 +29,7 @@ export const createFitFile = (
       manufacturer: "garmin",
       product: 0,
       serial_number: 0xdeadbeef,
-      time_created: start,
+      time_created: fitWriter.time(startTime),
       product_name: "TreadmillWalk",
     },
     null,
@@ -44,8 +43,10 @@ export const createFitFile = (
       total_timer_time: duration,
       num_sessions: 1,
       type: "manual",
-      timestamp: start,
-      local_timestamp: start - startTime.getTimezoneOffset() * 60,
+      timestamp: fitWriter.time(startTime),
+      local_timestamp: fitWriter.time(
+        startTime.getTime() - startTime.getTimezoneOffset() * 60 * 1000
+      ),
     },
     null,
     true
@@ -65,7 +66,7 @@ export const createFitFile = (
   fitWriter.writeMessage(
     "session",
     {
-      start_time: start,
+      start_time: fitWriter.time(startTime),
       total_elapsed_time: duration,
       total_timer_time: duration,
       total_distance: distance,
@@ -83,7 +84,7 @@ export const createFitFile = (
   fitWriter.writeMessage(
     "lap",
     {
-      start_time: start,
+      start_time: fitWriter.time(startTime),
       total_elapsed_time: duration,
       total_timer_time: duration,
       total_distance: distance,
